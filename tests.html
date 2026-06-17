@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Finance Tracker Tests</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+      .test-list {
+        display: grid;
+        gap: 0.75rem;
+        padding-left: 0;
+        list-style: none;
+      }
+
+      .test-list li {
+        border: 1px solid var(--line);
+        border-left-width: 0.4rem;
+        border-radius: 0.35rem;
+        padding: 0.75rem;
+        background: var(--surface);
+      }
+
+      .test-pass {
+        border-left-color: var(--primary);
+      }
+
+      .test-fail {
+        border-left-color: var(--warning);
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header">
+      <div class="container header-layout">
+        <div>
+          <p class="eyebrow">Validation checks</p>
+          <h1>Student Finance Tracker Tests</h1>
+        </div>
+        <nav class="site-nav" aria-label="Test navigation">
+          <a href="index.html">Back to app</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">M3 evidence</p>
+          <h2>Regex validation tests</h2>
+        </div>
+
+        <p id="test-summary" class="status-message" role="status" aria-live="polite">
+          Running tests...
+        </p>
+
+        <ul class="test-list" id="test-results"></ul>
+      </div>
+    </main>
+
+    <script type="module">
+      import {
+        validateAmount,
+        validateCategory,
+        validateDate,
+        validateDescription,
+        validateTransaction
+      } from "./scripts/validators.js";
+      import { compileRegex } from "./scripts/search.js";
+      import { calculateStats, getCapStatus, getLastSevenDays } from "./scripts/stats.js";
+      import { validateImportData } from "./scripts/storage.js";
+
+      // Tests are deliberately small and readable so they demonstrate student understanding without a framework.
+      const tests = [
+        {
+          name: "Description accepts normal text",
+          run: () => validateDescription("Lunch at cafeteria").valid === true
+        },
+        {
+          name: "Description rejects leading spaces",
+          run: () => validateDescription(" Lunch").valid === false
+        },
+        {
+          name: "Advanced regex rejects duplicate words",
+          run: () => validateDescription("coffee coffee").valid === false
+        },
+        {
+          name: "Amount accepts two decimal places",
+          run: () => validateAmount("12.50").valid === true
+        },
+        {
+          name: "Amount rejects three decimal places",
+          run: () => validateAmount("12.500").valid === false
+        },
+        {
+          name: "Date accepts YYYY-MM-DD",
+          run: () => validateDate("2025-09-29").valid === true
+        },
+        {
+          name: "Date rejects impossible calendar dates",
+          run: () => validateDate("2025-02-31").valid === false
+        },
+        {
+          name: "Category accepts spaces and hyphens",
+          run: () => validateCategory("School Fees").valid === true
+        },
+        {
+          name: "Category rejects numbers",
+          run: () => validateCategory("Food123").valid === false
+        },
+        {
+          name: "Full transaction passes when all fields are valid",
+          run: () =>
+            validateTransaction({
+              description: "Bus pass",
+              amount: "4500",
+              category: "Transport",
+              date: "2025-09-20",
+              currency: "RWF"
+            }).valid === true
+        },
+        {
+          name: "Regex search compiler accepts valid patterns",
+          run: () => compileRegex("coffee|tea", true).regex instanceof RegExp
+        },
+        {
+          name: "Regex search compiler rejects invalid patterns safely",
+          run: () => compileRegex("[coffee", true).error.length > 0
+        },
+        {
+          name: "Dashboard stats convert USD records to RWF",
+          run: () =>
+            calculateStats(
+              [
+                { amount: 1000, currency: "RWF", category: "Food", date: "2025-09-29" },
+                { amount: 2, currency: "USD", category: "Books", date: "2025-09-29" }
+              ],
+              { usdRate: 1300, eurRate: 1450, cap: 0 }
+            ).totalRwf === 3600
+        },
+        {
+          name: "Dashboard stats convert EUR records to RWF",
+          run: () =>
+            calculateStats(
+              [{ amount: 2, currency: "EUR", category: "Food", date: "2025-09-29" }],
+              { usdRate: 1300, eurRate: 1450, cap: 0 }
+            ).totalRwf === 2900
+        },
+        {
+          name: "Cap status detects overage",
+          run: () => getCapStatus(12000, 10000).exceeded === true
+        },
+        {
+          name: "Last seven days trend returns seven values",
+          run: () =>
+            getLastSevenDays([], { usdRate: 1300, cap: 0 }, new Date("2025-09-29")).length === 7
+        },
+        {
+          name: "Import validation accepts a valid backup shape",
+          run: () =>
+            validateImportData({
+              settings: { usdRate: 1300, eurRate: 1450, cap: 100000 },
+              records: [
+                {
+                  id: "txn_9999",
+                  description: "Lunch",
+                  amount: 2500,
+                  category: "Food",
+                  date: "2026-06-17",
+                  currency: "RWF",
+                  createdAt: "2026-06-17T08:10:00.000Z",
+                  updatedAt: "2026-06-17T08:10:00.000Z"
+                }
+              ]
+            }).valid === true
+        },
+        {
+          name: "Import validation rejects duplicate ids",
+          run: () =>
+            validateImportData({
+              settings: { usdRate: 1300, eurRate: 1450, cap: 100000 },
+              records: [
+                {
+                  id: "txn_9999",
+                  description: "Lunch",
+                  amount: 2500,
+                  category: "Food",
+                  date: "2026-06-17",
+                  currency: "RWF",
+                  createdAt: "2026-06-17T08:10:00.000Z",
+                  updatedAt: "2026-06-17T08:10:00.000Z"
+                },
+                {
+                  id: "txn_9999",
+                  description: "Bus pass",
+                  amount: 4500,
+                  category: "Transport",
+                  date: "2026-06-17",
+                  currency: "RWF",
+                  createdAt: "2026-06-17T08:20:00.000Z",
+                  updatedAt: "2026-06-17T08:20:00.000Z"
+                }
+              ]
+            }).valid === false
+        },
+        {
+          name: "Import validation rejects unsupported currency",
+          run: () =>
+            validateImportData({
+              settings: { usdRate: 1300, eurRate: 1450, cap: 100000 },
+              records: [
+                {
+                  id: "txn_8888",
+                  description: "Lunch",
+                  amount: 2500,
+                  category: "Food",
+                  date: "2026-06-17",
+                  currency: "GBP",
+                  createdAt: "2026-06-17T08:10:00.000Z",
+                  updatedAt: "2026-06-17T08:10:00.000Z"
+                }
+              ]
+            }).valid === false
+        }
+      ];
+
+      const results = document.querySelector("#test-results");
+      const summary = document.querySelector("#test-summary");
+      let passed = 0;
+
+      tests.forEach((test) => {
+        const ok = test.run();
+        const item = document.createElement("li");
+
+        item.className = ok ? "test-pass" : "test-fail";
+        item.textContent = `${ok ? "PASS" : "FAIL"}: ${test.name}`;
+        results.append(item);
+
+        if (ok) {
+          passed += 1;
+        }
+      });
+
+      summary.textContent = `${passed} of ${tests.length} validation tests passed.`;
+    </script>
+  </body>
+</html>

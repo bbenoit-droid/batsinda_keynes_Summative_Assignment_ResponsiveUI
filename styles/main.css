@@ -1,0 +1,585 @@
+:root {
+  /* Shared tokens keep the palette, focus color, and spacing decisions consistent across the app. */
+  --bg: #f6f7f2;
+  --surface: #ffffff;
+  --surface-strong: #edf4ee;
+  --text: #17211b;
+  --muted: #5d6b61;
+  --line: #cfd8d0;
+  --primary: #246b4f;
+  --primary-dark: #164833;
+  --accent: #b8572a;
+  --warning: #9f2f26;
+  --focus: #0b74de;
+  --shadow: 0 16px 36px rgba(18, 31, 24, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* Smooth scrolling improves in-page navigation; reduced-motion users are handled at the end of the file. */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+a {
+  color: var(--primary-dark);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+code {
+  font-family: "Courier New", Courier, monospace;
+}
+
+mark {
+  border-radius: 0.2rem;
+  padding-inline: 0.12rem;
+  background: #ffe08a;
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  /* Hidden off-canvas until focused, giving keyboard users a fast path to the app content. */
+  position: absolute;
+  left: 1rem;
+  top: 0.75rem;
+  z-index: 10;
+  transform: translateY(-160%);
+  background: var(--text);
+  color: #ffffff;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.35rem;
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.container {
+  width: min(100% - 2rem, 1120px);
+  margin-inline: auto;
+}
+
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.header-layout {
+  display: grid;
+  gap: 1rem;
+  padding-block: 1.25rem;
+}
+
+.site-header h1,
+.section h2,
+.section h3,
+p {
+  margin-top: 0;
+}
+
+.site-header h1 {
+  margin-bottom: 0;
+  font-size: 1.9rem;
+  line-height: 1.05;
+}
+
+.eyebrow {
+  margin-bottom: 0.35rem;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.site-nav a {
+  min-height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--surface-strong);
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.site-nav a:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.section {
+  padding-block: 2.5rem;
+}
+
+.section-intro {
+  background: var(--surface-strong);
+}
+
+.intro-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.intro-layout h2 {
+  max-width: 760px;
+  margin-bottom: 0.85rem;
+  font-size: 1.8rem;
+  line-height: 1.08;
+}
+
+.intro-layout p {
+  max-width: 680px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.summary-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.summary-strip span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 0.75rem;
+  background: var(--surface);
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.section-heading {
+  margin-bottom: 1.2rem;
+}
+
+.section-heading h2 {
+  margin-bottom: 0;
+  font-size: 1.45rem;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.stat-card,
+.panel,
+.chart-panel,
+.about-panel {
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.stat-card {
+  padding: 1rem;
+}
+
+.stat-card h3 {
+  margin-bottom: 0.6rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.stat-value {
+  margin-bottom: 0;
+  color: var(--primary-dark);
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.chart-panel {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.chart-panel h3 {
+  margin-bottom: 0.35rem;
+}
+
+.chart-panel p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.mini-chart {
+  /* Fixed chart height prevents layout shift as transaction totals change. */
+  min-height: 9rem;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(1rem, 1fr));
+  align-items: end;
+  gap: 0.45rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: #fbfcfa;
+}
+
+.mini-chart span {
+  min-height: 1rem;
+  height: var(--bar-height);
+  border-radius: 0.3rem 0.3rem 0 0;
+  background: var(--primary);
+}
+
+.status-message {
+  /* Status blocks are visually persistent so live-region updates are not easy to miss. */
+  margin-top: 1rem;
+  margin-bottom: 0;
+  border-left: 4px solid var(--primary);
+  padding: 0.8rem 1rem;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.status-message.compact {
+  margin-top: 0;
+}
+
+.status-message.danger {
+  border-left-color: var(--warning);
+  color: var(--warning);
+  font-weight: 700;
+}
+
+.two-column {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel,
+.about-panel {
+  padding: 1rem;
+}
+
+.transaction-form,
+.settings-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field-row {
+  display: grid;
+  gap: 1rem;
+}
+
+.field-group {
+  display: grid;
+  gap: 0.35rem;
+}
+
+label,
+.checkbox-label {
+  font-weight: 700;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  background: #ffffff;
+  color: var(--text);
+}
+
+input[aria-invalid="true"],
+select[aria-invalid="true"] {
+  border-color: var(--warning);
+  box-shadow: 0 0 0 1px var(--warning);
+}
+
+input:focus,
+select:focus {
+  border-color: var(--focus);
+}
+
+.field-hint,
+.field-error {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.field-hint {
+  color: var(--muted);
+}
+
+.field-error {
+  color: var(--warning);
+  font-weight: 700;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.button {
+  min-height: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  padding: 0.7rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button.primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.button.primary:hover {
+  background: var(--primary-dark);
+}
+
+.button.secondary {
+  border-color: var(--line);
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+.button.secondary:hover {
+  border-color: var(--primary);
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.table-action {
+  min-height: 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  padding: 0.45rem 0.65rem;
+  background: var(--surface-strong);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.table-action:hover {
+  border-color: var(--primary);
+}
+
+.table-action.delete {
+  border-color: #e0b7b3;
+  color: var(--warning);
+}
+
+.toolbar {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: var(--surface);
+}
+
+.checkbox-label {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.checkbox-label input {
+  width: 1.1rem;
+  min-height: auto;
+  height: 1.1rem;
+}
+
+.table-wrap {
+  /* Horizontal scrolling keeps table semantics intact on small screens. */
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+}
+
+caption {
+  padding: 0.85rem 1rem;
+  color: var(--muted);
+  text-align: left;
+}
+
+th,
+td {
+  border-top: 1px solid var(--line);
+  padding: 0.85rem 1rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--surface-strong);
+  color: var(--primary-dark);
+}
+
+address {
+  font-style: normal;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding-block: 1.25rem;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.site-footer p {
+  margin-bottom: 0;
+}
+
+@media (min-width: 360px) {
+  /* First breakpoint improves compact phones without assuming tablet space. */
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  /* Tablet layout starts using two-column form rows while keeping reading order logical. */
+  .site-header h1 {
+    font-size: 2.35rem;
+  }
+
+  .intro-layout h2 {
+    font-size: 2.55rem;
+  }
+
+  .section-heading h2 {
+    font-size: 1.75rem;
+  }
+
+  .header-layout {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+
+  .intro-layout {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .field-row,
+  .toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .toolbar {
+    align-items: end;
+  }
+
+  .search-field {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop layout adds density for repeated finance review tasks. */
+  .section {
+    padding-block: 3.5rem;
+  }
+
+  .site-header h1 {
+    font-size: 2.75rem;
+  }
+
+  .intro-layout h2 {
+    font-size: 3.25rem;
+  }
+
+  .section-heading h2 {
+    font-size: 2rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .chart-panel,
+  .two-column {
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  }
+
+  .toolbar {
+    grid-template-columns: minmax(320px, 1fr) auto minmax(220px, 0.45fr);
+  }
+
+  .search-field {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Respect users who request less motion while preserving the same layout and controls. */
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
