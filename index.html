@@ -6,14 +6,14 @@
     <title>Student Budget Tracker</title>
     <script>
       try {
-        const savedData = JSON.parse(localStorage.getItem("student-finance-tracker:data"));
+        const savedData = JSON.parse(localStorage.getItem("student-budget-tracker:data"));
         document.documentElement.dataset.theme =
           savedData?.settings?.theme === "dark" ? "dark" : "light";
       } catch {
         document.documentElement.dataset.theme = "light";
       }
     </script>
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="assets/css/student-budget.css">
   </head>
   <body>
     <a class="skipLink" href="#mainArea">Skip to main content</a>
@@ -40,7 +40,7 @@
         </nav>
 
         <div class="sidebarNote">
-          <p>&copy; Student Finance Tracker 2026</p>
+          <p>&copy; Student Budget Tracker 2026</p>
         </div>
       </aside>
 
@@ -380,6 +380,6 @@
       </main>
     </div>
 
-    <script type="module" src="scripts/app.js"></script>
+    <script type="module" src="assets/js/main.js"></script>
   </body>
 </html>

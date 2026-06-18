@@ -1,10 +1,9 @@
-import { validateCategory, validateDate, validateDescription } from "./validators.js";
+import { validateCategory, validateDate, validateDescription } from "./formChecks.js";
 
-const STORAGE_KEY = "student-finance-tracker:data";
+const STORAGE_KEY = "student-budget-tracker:data";
 
 export function loadSavedData() {
   try {
-    // localStorage data is treated as untrusted because users can edit it from browser dev tools.
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : null;
   } catch {
@@ -13,14 +12,12 @@ export function loadSavedData() {
 }
 
 export function saveData(data) {
-  // The whole app state is small, so one JSON document is simpler than multiple storage keys.
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
 export function buildExportData(records, settings) {
-  // Export metadata makes backups easier to identify and leaves room for future migrations.
   return {
-    app: "Student Finance Tracker",
+    app: "Student Budget Tracker",
     version: 1,
     exportedAt: new Date().toISOString(),
     settings,
@@ -29,7 +26,6 @@ export function buildExportData(records, settings) {
 }
 
 export function validateImportData(data) {
-  // Import validation is intentionally strict: bad backups should not partially replace current records.
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     return { valid: false, message: "Imported JSON must be an object." };
   }
@@ -157,7 +153,6 @@ function validateImportedRecord(record, seenIds) {
 }
 
 function validateImportedAmount(value) {
-  // Imported data should already be numeric JSON, not strings from form controls.
   if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
     return { valid: false, message: "Amount must be a zero or positive number." };
   }

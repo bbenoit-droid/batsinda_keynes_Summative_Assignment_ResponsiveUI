@@ -1,15 +1,12 @@
 export const patterns = {
-  // These regexes mirror the assignment requirements and keep validation rules easy to review.
   description: /^\S(?:.*\S)?$/,
   amount: /^(0|[1-9]\d*)(\.\d{1,2})?$/,
   date: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
   category: /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/,
-  // Back-reference catches repeated words such as "coffee coffee", demonstrating an advanced regex rule.
   duplicateWords: /\b(\w+)\s+\1\b/i
 };
 
 export function normalizeDescription(value) {
-  // Normalization stores tidy data while validation still warns about user-entered leading/trailing spaces.
   return value.trim().replace(/\s+/g, " ");
 }
 
@@ -68,8 +65,6 @@ export function validateDate(value) {
   if (!patterns.date.test(trimmed)) {
     return { valid: false, value: trimmed, message: "Date must use YYYY-MM-DD format." };
   }
-
-  // Regex checks the shape; this date object check rejects impossible dates such as 2025-02-31.
   const date = new Date(`${trimmed}T00:00:00`);
   const isRealDate =
     date.getFullYear() === Number(trimmed.slice(0, 4)) &&
@@ -102,7 +97,6 @@ export function validateCategory(value) {
 }
 
 export function validateTransaction(formData) {
-  // The form handler receives both per-field messages and cleaned data, keeping UI and validation separate.
   const fields = {
     description: validateDescription(formData.description),
     amount: validateAmount(formData.amount),

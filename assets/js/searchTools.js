@@ -1,6 +1,5 @@
 export function compileRegex(input, caseInsensitive = true) {
   try {
-    // User search is intentionally regex-powered, but compilation is guarded so a typo cannot break the page.
     return input
       ? { regex: new RegExp(input, caseInsensitive ? "gi" : "g"), error: "" }
       : { regex: null, error: "" };
@@ -15,7 +14,6 @@ export function recordMatches(record, regex) {
   }
 
   const searchable = `${record.date} ${record.description} ${record.category} ${record.currency} ${record.amount}`;
-  // Global regexes keep lastIndex between calls, so reset before testing each record.
   regex.lastIndex = 0;
   return regex.test(searchable);
 }
@@ -29,7 +27,6 @@ export function highlightedFragment(text, regex) {
   }
 
   const value = String(text);
-  // Clone the regex before highlighting so rendering does not disturb the search regex state.
   const safeRegex = new RegExp(regex.source, regex.flags);
   let lastIndex = 0;
   let match = safeRegex.exec(value);
@@ -46,7 +43,6 @@ export function highlightedFragment(text, regex) {
     lastIndex = match.index + match[0].length;
 
     if (match[0].length === 0) {
-      // Zero-length matches must advance manually to avoid an infinite loop.
       safeRegex.lastIndex += 1;
     }
 

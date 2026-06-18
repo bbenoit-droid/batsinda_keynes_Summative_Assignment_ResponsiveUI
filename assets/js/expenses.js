@@ -11,8 +11,6 @@ export const defaultSettings = {
   compactTable: false,
   confirmBeforeDelete: true
 };
-
-// State is kept in one module so rendering, storage, and validation do not each invent their own data shape.
 export const state = {
   records: [
     {
@@ -68,8 +66,6 @@ function nextRecordId() {
 
   return `txn_${String(highestId + 1).padStart(4, "0")}`;
 }
-
-// New records receive timestamps here so the form code can focus on user input only.
 export function createRecord(data) {
   const timestamp = new Date().toISOString();
 
@@ -80,13 +76,9 @@ export function createRecord(data) {
     updatedAt: timestamp
   };
 }
-
-// Records are added to the top because recent spending is usually the first thing students review.
 export function addRecord(record) {
   state.records = [record, ...state.records];
 }
-
-// Updating preserves the original createdAt value and changes only the edited fields plus updatedAt.
 export function updateRecord(id, data) {
   state.records = state.records.map((record) =>
     record.id === id
@@ -106,14 +98,10 @@ export function deleteRecord(id) {
 export function findRecord(id) {
   return state.records.find((record) => record.id === id);
 }
-
-// Import replaces the current list only after storage validation has accepted every record.
 export function replaceRecords(records) {
   state.records = records;
   state.editingId = null;
 }
-
-// Settings are merged so adding a new setting later does not require every caller to supply all keys.
 export function updateSettings(settings) {
   state.settings = {
     ...state.settings,

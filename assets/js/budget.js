@@ -1,5 +1,4 @@
 export function toRwf(record, usdRate, eurRate = 1450) {
-  // Summary totals use RWF as the common base so mixed-currency expenses remain comparable.
   if (record.currency === "USD") {
     return record.amount * usdRate;
   }
@@ -12,12 +11,10 @@ export function toRwf(record, usdRate, eurRate = 1450) {
 }
 
 export function formatRwf(amount) {
-  // Rounding avoids false precision because exchange rates are entered manually.
   return `RWF ${Math.round(amount).toLocaleString()}`;
 }
 
 export function calculateStats(records, settings) {
-  // Stats are derived from state on each render instead of being stored separately and risking drift.
   const totalExpenseAmount = records.reduce(
     (sum, record) => sum + toRwf(record, settings.usdRate, settings.eurRate),
     0
@@ -38,7 +35,6 @@ export function calculateStats(records, settings) {
 }
 
 export function getCapStatus(totalExpenseAmount, cap) {
-  // The cap message feeds an ARIA live region, so it is written as a complete sentence.
   if (!cap) {
     return {
       exceeded: false,
@@ -65,7 +61,6 @@ export function getCapStatus(totalExpenseAmount, cap) {
 }
 
 export function getLastSevenDays(records, settings, today = new Date()) {
-  // The chart intentionally uses the last seven calendar days, not the last seven transaction dates.
   const days = [];
   const start = new Date(today);
   start.setHours(0, 0, 0, 0);

@@ -1,9 +1,9 @@
 {
-  "name": "student-finance-tracker",
+  "name": "student-budget-tracker",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check scripts/app.js && node --check scripts/state.js && node --check scripts/storage.js && node --check scripts/validators.js && node --check scripts/search.js && node --check scripts/stats.js"
+    "check": "node --check assets/js/main.js && node --check assets/js/expenses.js && node --check assets/js/savedData.js && node --check assets/js/formChecks.js && node --check assets/js/searchTools.js && node --check assets/js/budget.js"
   }
 }

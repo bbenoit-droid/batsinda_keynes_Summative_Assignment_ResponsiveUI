@@ -1,4 +1,4 @@
-import { validateTransaction } from "./validators.js";
+import { validateTransaction } from "./formChecks.js";
 import {
   addRecord,
   createRecord,
@@ -8,10 +8,10 @@ import {
   state,
   updateRecord,
   updateSettings as saveBudgetSettings
-} from "./state.js";
-import { compileRegex, highlightedFragment, recordMatches } from "./search.js";
-import { calculateStats, formatRwf, getLastSevenDays } from "./stats.js";
-import { buildExportData, loadSavedData, saveData, validateImportData } from "./storage.js";
+} from "./expenses.js";
+import { compileRegex, highlightedFragment, recordMatches } from "./searchTools.js";
+import { calculateStats, formatRwf, getLastSevenDays } from "./budget.js";
+import { buildExportData, loadSavedData, saveData, validateImportData } from "./savedData.js";
 
 const expenseForm = document.querySelector(".expenseForm");
 const formMessage = document.querySelector("#formMessage");
@@ -64,9 +64,6 @@ const budgetInputs = {
   eurRate: eurRateInput,
   cap: monthlyBudgetInput
 };
-
-// Field-level errors are written next to the input and reflected with aria-invalid.
-// This gives visual users and assistive technology users the same validation state.
 function setFieldError(name, message) {
   const target = errorTargets[name];
   const input = expenseForm.elements[name];
@@ -100,8 +97,6 @@ function setBudgetError(name, message) {
 function clearBudgetErrors() {
   Object.keys(budgetErrorTargets).forEach((name) => setBudgetError(name, ""));
 }
-
-// Save the same data shape after adding, editing, deleting, budgeting, or importing.
 function persist() {
   saveData(buildExportData(state.records, state.settings));
 }
@@ -124,8 +119,6 @@ function applyDisplaySettings() {
   document.body.classList.toggle("compactTable", state.settings.compactTable);
   chartBox.hidden = !state.settings.showWeeklyChart;
 }
-
-// Browser storage may contain old or hand-edited data, so it is validated before it replaces sample records.
 function loadInitialData() {
   const saved = loadSavedData();
 
@@ -148,8 +141,6 @@ function loadInitialData() {
   applyDisplaySettings();
   settingsMessage.textContent = "Saved browser data loaded.";
 }
-
-// Reading through form elements keeps the code tied to field names instead of layout.
 function readExpenseForm() {
   return {
     description: expenseForm.elements.description.value,
@@ -159,8 +150,6 @@ function readExpenseForm() {
     currency: expenseForm.elements.currency.value
   };
 }
-
-// Edit mode reuses the add expense form so the project stays easy to follow.
 function fillExpenseForm(record) {
   expenseForm.elements.description.value = record.description;
   expenseForm.elements.amount.value = record.amount;
@@ -181,8 +170,6 @@ function resetExpenseForm(message = "Form cleared.") {
   expenseCurrencySelect.value = state.settings.defaultCurrency;
   formMessage.textContent = message;
 }
-
-// Sorting returns a copy so the saved expense order is not changed by table controls.
 function sortExpenseList(expenses, sortValue) {
   const sorted = [...expenses];
 
@@ -214,8 +201,6 @@ function sortExpenseList(expenses, sortValue) {
     return 0;
   });
 }
-
-// Expense amounts keep their original currency in the table; summary totals convert to RWF.
 function formatExpenseAmount(record) {
   return `${record.currency} ${record.amount.toLocaleString(undefined, {
     minimumFractionDigits: record.amount % 1 === 0 ? 0 : 2,
@@ -264,8 +249,6 @@ function parseCap(value) {
     value: trimmed === "" ? 0 : number
   };
 }
-
-// Budget validation is explicit so students can see and fix input mistakes.
 function readBudgetSettings() {
   const usdRate = parsePositiveNumber(usdRateInput.value);
   const eurRate = parsePositiveNumber(eurRateInput.value);
@@ -303,8 +286,6 @@ function readBudgetSettings() {
 
   return true;
 }
-
-// The chart uses simple CSS bars, with the same values also written in text.
 function showWeeklyChart() {
   const days = getLastSevenDays(state.records, state.settings);
   weeklyChart.innerHTML = "";
@@ -353,15 +334,11 @@ function showFinancialSummary() {
 
   showWeeklyChart();
 }
-
-// Search highlighting uses DOM text nodes rather than innerHTML to avoid injecting user-entered regex text.
 function appendHighlightedCell(row, value, regex) {
   const cell = document.createElement("td");
   cell.append(highlightedFragment(String(value), regex));
   row.append(cell);
 }
-
-// Action buttons are created with native button elements for keyboard and screen-reader support.
 function createActionButton(label, className, onClick) {
   const button = document.createElement("button");
   button.className = `smallTableButton ${className}`;
@@ -489,7 +466,7 @@ function exportJson() {
   const link = document.createElement("a");
 
   link.href = url;
-  link.download = "student-finance-tracker-backup.json";
+  link.download = "student-budget-tracker-backup.json";
   link.click();
   URL.revokeObjectURL(url);
 

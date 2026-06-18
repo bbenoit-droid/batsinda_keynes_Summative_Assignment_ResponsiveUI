@@ -1,11 +1,17 @@
 {
-  "app": "Student Finance Tracker",
+  "app": "Student Budget Tracker",
   "version": 1,
   "exportedAt": "2026-06-17T10:00:00.000Z",
   "settings": {
     "usdRate": 1300,
     "eurRate": 1450,
-    "cap": 150000
+    "cap": 150000,
+    "theme": "light",
+    "defaultCurrency": "RWF",
+    "displayCurrency": "RWF",
+    "showWeeklyChart": true,
+    "compactTable": false,
+    "confirmBeforeDelete": true
   },
   "records": [
     {
