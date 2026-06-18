@@ -70,6 +70,14 @@ function validateSettings(settings) {
   const usdRate = Number(settings.usdRate ?? 1300);
   const eurRate = Number(settings.eurRate ?? 1450);
   const cap = Number(settings.cap ?? 0);
+  const theme = validateChoice(settings.theme, ["light", "dark"], "light");
+  const defaultCurrency = validateChoice(settings.defaultCurrency, ["RWF", "USD", "EUR"], "RWF");
+  const displayCurrency = validateChoice(settings.displayCurrency, ["RWF", "USD", "EUR"], "RWF");
+  const showWeeklyChart =
+    typeof settings.showWeeklyChart === "boolean" ? settings.showWeeklyChart : true;
+  const compactTable = typeof settings.compactTable === "boolean" ? settings.compactTable : false;
+  const confirmBeforeDelete =
+    typeof settings.confirmBeforeDelete === "boolean" ? settings.confirmBeforeDelete : true;
 
   if (!Number.isFinite(usdRate) || usdRate <= 0) {
     return { valid: false, message: "Settings must include a positive USD rate." };
@@ -88,9 +96,19 @@ function validateSettings(settings) {
     settings: {
       usdRate,
       eurRate,
-      cap
+      cap,
+      theme,
+      defaultCurrency,
+      displayCurrency,
+      showWeeklyChart,
+      compactTable,
+      confirmBeforeDelete
     }
   };
+}
+
+function validateChoice(value, allowedValues, fallback) {
+  return allowedValues.includes(value) ? value : fallback;
 }
 
 function validateImportedRecord(record, seenIds) {

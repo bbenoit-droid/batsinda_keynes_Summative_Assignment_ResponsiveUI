@@ -3,62 +3,75 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Finance Tracker Tests</title>
+    <title>Student Budget Tracker Tests</title>
+    <script>
+      try {
+        const savedData = JSON.parse(localStorage.getItem("student-finance-tracker:data"));
+        document.documentElement.dataset.theme =
+          savedData?.settings?.theme === "dark" ? "dark" : "light";
+      } catch {
+        document.documentElement.dataset.theme = "light";
+      }
+    </script>
     <link rel="stylesheet" href="styles/main.css">
     <style>
-      .test-list {
+      .testList {
         display: grid;
         gap: 0.75rem;
         padding-left: 0;
         list-style: none;
       }
 
-      .test-list li {
-        border: 1px solid var(--line);
+      .testList li {
+        border: 1px solid var(--borderColor);
         border-left-width: 0.4rem;
         border-radius: 0.35rem;
         padding: 0.75rem;
-        background: var(--surface);
+        background: var(--white);
       }
 
-      .test-pass {
-        border-left-color: var(--primary);
+      .testPass {
+        border-left-color: var(--green);
       }
 
-      .test-fail {
-        border-left-color: var(--warning);
+      .testFail {
+        border-left-color: var(--red);
       }
     </style>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="skipLink" href="#mainArea">Skip to main content</a>
 
-    <header class="site-header">
-      <div class="container header-layout">
-        <div>
-          <p class="eyebrow">Validation checks</p>
-          <h1>Student Finance Tracker Tests</h1>
+    <div class="pageLayout">
+      <aside class="leftSidebar" aria-label="Test navigation">
+        <div class="studentLogo">
+          <span class="logoBox" aria-hidden="true">SBT</span>
+          <div>
+            <p class="smallTitle">Testing page</p>
+            <h1>Student Budget Tracker Tests</h1>
+          </div>
         </div>
-        <nav class="site-nav" aria-label="Test navigation">
-          <a href="index.html">Back to app</a>
+
+        <nav class="sideMenu" aria-label="Test navigation">
+          <a href="index.html">Back to Website</a>
         </nav>
-      </div>
-    </header>
+      </aside>
 
-    <main id="main-content" class="section">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">M3 evidence</p>
-          <h2>Regex validation tests</h2>
+      <main id="mainArea" class="mainArea">
+        <div class="pageSection">
+          <div class="sectionTitle">
+            <p class="smallTitle">Evidence</p>
+            <h2>Validation Tests</h2>
+          </div>
+
+          <p id="testSummary" class="messageBox" role="status" aria-live="polite">
+            Running tests...
+          </p>
+
+          <ul class="testList" id="testResults"></ul>
         </div>
-
-        <p id="test-summary" class="status-message" role="status" aria-live="polite">
-          Running tests...
-        </p>
-
-        <ul class="test-list" id="test-results"></ul>
-      </div>
-    </main>
+      </main>
+    </div>
 
     <script type="module">
       import {
@@ -130,7 +143,7 @@
           run: () => compileRegex("[coffee", true).error.length > 0
         },
         {
-          name: "Dashboard stats convert USD records to RWF",
+          name: "Financial summary converts USD expenses to RWF",
           run: () =>
             calculateStats(
               [
@@ -138,15 +151,15 @@
                 { amount: 2, currency: "USD", category: "Books", date: "2025-09-29" }
               ],
               { usdRate: 1300, eurRate: 1450, cap: 0 }
-            ).totalRwf === 3600
+            ).totalExpenses === 3600
         },
         {
-          name: "Dashboard stats convert EUR records to RWF",
+          name: "Financial summary converts EUR expenses to RWF",
           run: () =>
             calculateStats(
               [{ amount: 2, currency: "EUR", category: "Food", date: "2025-09-29" }],
               { usdRate: 1300, eurRate: 1450, cap: 0 }
-            ).totalRwf === 2900
+            ).totalExpenses === 2900
         },
         {
           name: "Cap status detects overage",
@@ -226,15 +239,15 @@
         }
       ];
 
-      const results = document.querySelector("#test-results");
-      const summary = document.querySelector("#test-summary");
+      const results = document.querySelector("#testResults");
+      const summary = document.querySelector("#testSummary");
       let passed = 0;
 
       tests.forEach((test) => {
         const ok = test.run();
         const item = document.createElement("li");
 
-        item.className = ok ? "test-pass" : "test-fail";
+        item.className = ok ? "testPass" : "testFail";
         item.textContent = `${ok ? "PASS" : "FAIL"}: ${test.name}`;
         results.append(item);
 

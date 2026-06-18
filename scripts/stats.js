@@ -1,5 +1,5 @@
 export function toRwf(record, usdRate, eurRate = 1450) {
-  // Dashboard totals use RWF as the common base so mixed-currency records remain comparable.
+  // Summary totals use RWF as the common base so mixed-currency expenses remain comparable.
   if (record.currency === "USD") {
     return record.amount * usdRate;
   }
@@ -18,7 +18,7 @@ export function formatRwf(amount) {
 
 export function calculateStats(records, settings) {
   // Stats are derived from state on each render instead of being stored separately and risking drift.
-  const totalRwf = records.reduce(
+  const totalExpenseAmount = records.reduce(
     (sum, record) => sum + toRwf(record, settings.usdRate, settings.eurRate),
     0
   );
@@ -27,40 +27,40 @@ export function calculateStats(records, settings) {
       (totals[record.category] || 0) + toRwf(record, settings.usdRate, settings.eurRate);
     return totals;
   }, {});
-  const topCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] || "None";
+  const mainCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] || "None";
 
   return {
-    totalRecords: records.length,
-    totalRwf,
-    topCategory,
-    capStatus: getCapStatus(totalRwf, settings.cap)
+    totalTransactions: records.length,
+    totalExpenses: totalExpenseAmount,
+    mainCategory,
+    budgetStatus: getCapStatus(totalExpenseAmount, settings.cap)
   };
 }
 
-export function getCapStatus(totalRwf, cap) {
+export function getCapStatus(totalExpenseAmount, cap) {
   // The cap message feeds an ARIA live region, so it is written as a complete sentence.
   if (!cap) {
     return {
       exceeded: false,
-      label: "Set a cap",
-      message: "Set a spending cap to see remaining budget."
+      label: "Set budget",
+      message: "Enter a monthly budget to see the remaining balance."
     };
   }
 
-  const difference = cap - totalRwf;
+  const difference = cap - totalExpenseAmount;
 
   if (difference >= 0) {
     return {
       exceeded: false,
       label: `${formatRwf(difference)} left`,
-      message: `You are under your spending cap by ${formatRwf(difference)}.`
+      message: `Your remaining balance is ${formatRwf(difference)}.`
     };
   }
 
   return {
     exceeded: true,
     label: `${formatRwf(Math.abs(difference))} over`,
-    message: `You have exceeded your spending cap by ${formatRwf(Math.abs(difference))}.`
+    message: `Your expenses are over the monthly budget by ${formatRwf(Math.abs(difference))}.`
   };
 }
 

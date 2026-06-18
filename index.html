@@ -3,237 +3,223 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Finance Tracker</title>
+    <title>Student Budget Tracker</title>
+    <script>
+      try {
+        const savedData = JSON.parse(localStorage.getItem("student-finance-tracker:data"));
+        document.documentElement.dataset.theme =
+          savedData?.settings?.theme === "dark" ? "dark" : "light";
+      } catch {
+        document.documentElement.dataset.theme = "light";
+      }
+    </script>
     <link rel="stylesheet" href="styles/main.css">
   </head>
   <body>
-    <!-- The skip link is the first focusable element so keyboard users can bypass repeated navigation. -->
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="skipLink" href="#mainArea">Skip to main content</a>
 
-    <header class="site-header">
-      <div class="container header-layout">
-        <div>
-          <p class="eyebrow">Student budget tool</p>
-          <h1>Student Finance Tracker</h1>
-        </div>
-
-        <nav class="site-nav" aria-label="Primary navigation">
-          <a href="#dashboard">Dashboard</a>
-          <a href="#records">Records</a>
-          <a href="#form-panel">Add</a>
-          <a href="#settings">Settings</a>
-          <a href="#about">About</a>
-        </nav>
-      </div>
-    </header>
-
-    <main id="main-content">
-      <section class="section section-intro" aria-labelledby="intro-title">
-        <div class="container intro-layout">
+    <div class="pageLayout">
+      <aside class="leftSidebar" aria-label="Main navigation">
+        <div class="studentLogo">
+          <span class="logoBox" aria-hidden="true">SBT</span>
           <div>
-            <p class="eyebrow">RWF base, USD and EUR ready</p>
-            <h2 id="intro-title">Track everyday student spending without making it complicated.</h2>
-            <p>
-              Add expenses, review totals, search with regex, and check whether your spending is staying
-              within your cap.
-            </p>
-          </div>
-          <!-- These highlights justify the feature set without adding unrelated app complexity. -->
-          <div class="summary-strip" aria-label="Planned app highlights">
-            <span>Mobile-first</span>
-            <span>Regex search</span>
-            <span>Import/export</span>
+            <p class="smallTitle">Student project</p>
+            <h1>Student Budget Tracker</h1>
           </div>
         </div>
-      </section>
 
-      <section class="section" id="dashboard" aria-labelledby="dashboard-title">
-        <div class="container">
-          <div class="section-heading">
-            <p class="eyebrow">Dashboard</p>
-            <h2 id="dashboard-title">Spending overview</h2>
-          </div>
+        <nav class="sideMenu" aria-label="Page sections">
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#features">Features</a>
+          <a href="#addExpense">Add Expense</a>
+          <a href="#summary">Summary</a>
+          <a href="#transactions">Transactions</a>
+          <a href="#settings">Settings</a>
+          <a href="#contact">Contact</a>
+        </nav>
 
-          <div class="stats-grid" aria-label="Finance summary">
-            <article class="stat-card">
-              <h3>Total records</h3>
-              <p class="stat-value" id="total-records">0</p>
-            </article>
-            <article class="stat-card">
-              <h3>Total spent</h3>
-              <p class="stat-value" id="total-spent">RWF 0</p>
-            </article>
-            <article class="stat-card">
-              <h3>Top category</h3>
-              <p class="stat-value" id="top-category">None</p>
-            </article>
-            <article class="stat-card">
-              <h3>Cap status</h3>
-              <p class="stat-value" id="cap-status">Set a cap</p>
-            </article>
-          </div>
+        <div class="sidebarNote">
+          <p>&copy; Student Finance Tracker 2026</p>
+        </div>
+      </aside>
 
-          <div class="chart-panel" aria-labelledby="trend-title">
-            <div>
-              <h3 id="trend-title">Last 7 days</h3>
-              <p id="trend-summary">The chart will update when transactions are added.</p>
-            </div>
-            <!-- The visual bars are hidden from assistive technology because the text summary above contains the data. -->
-            <div class="mini-chart" id="last-seven-chart" aria-hidden="true"></div>
-          </div>
-
-          <p class="status-message" id="budget-live" role="status" aria-live="polite">
-            Budget messages will appear here when records and caps are added.
+      <main class="mainArea" id="mainArea">
+        <section class="pageSection homeSection" id="home" aria-labelledby="homeTitle">
+          <p class="smallTitle">Personal finance project</p>
+          <h2 id="homeTitle">Track expenses and understand your student budget.</h2>
+          <p>
+            This single-page website helps a student add daily expenses, set a monthly budget,
+            and read a simple financial summary in one place.
           </p>
-        </div>
-      </section>
+        </section>
 
-      <section class="section" id="form-panel" aria-labelledby="form-title">
-        <div class="container two-column">
-          <div class="panel">
-            <div class="section-heading">
-              <p class="eyebrow">Add or edit</p>
-              <h2 id="form-title">Transaction form</h2>
-            </div>
-
-            <form class="transaction-form" novalidate>
-              <!-- novalidate lets the custom validation module provide consistent regex-based messages. -->
-              <div class="field-group">
-                <label for="description">Description</label>
-                <input id="description" name="description" type="text" autocomplete="off" aria-describedby="description-hint description-error" aria-invalid="false" required>
-                <p class="field-hint" id="description-hint">Example: Lunch at cafeteria</p>
-                <p class="field-error" id="description-error" aria-live="polite"></p>
-              </div>
-
-              <div class="field-row">
-                <div class="field-group">
-                  <label for="amount">Amount</label>
-                  <input id="amount" name="amount" type="text" inputmode="decimal" aria-describedby="amount-hint amount-error" aria-invalid="false" required>
-                  <p class="field-hint" id="amount-hint">Use whole numbers or two decimals.</p>
-                  <p class="field-error" id="amount-error" aria-live="polite"></p>
-                </div>
-
-                <div class="field-group">
-                  <label for="currency">Currency</label>
-                  <select id="currency" name="currency">
-                    <option value="RWF">RWF</option>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <div class="field-group">
-                  <label for="category">Category</label>
-                  <select id="category" name="category" aria-describedby="category-error" aria-invalid="false" required>
-                    <option value="">Choose category</option>
-                    <option value="Food">Food</option>
-                    <option value="Books">Books</option>
-                    <option value="Transport">Transport</option>
-                    <option value="Entertainment">Entertainment</option>
-                    <option value="Fees">Fees</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  <p class="field-error" id="category-error" aria-live="polite"></p>
-                </div>
-
-                <div class="field-group">
-                  <label for="date">Date</label>
-                  <input id="date" name="date" type="date" aria-describedby="date-error" aria-invalid="false" required>
-                  <p class="field-error" id="date-error" aria-live="polite"></p>
-                </div>
-              </div>
-
-              <p class="status-message compact" id="form-status" role="status" aria-live="polite">
-                Validation messages will appear here after submitting the form.
-              </p>
-
-              <div class="button-row">
-                <button class="button primary" type="submit">Save transaction</button>
-                <button class="button secondary" type="reset">Clear</button>
-              </div>
-            </form>
+        <section class="pageSection" id="about" aria-labelledby="aboutTitle">
+          <div class="sectionTitle">
+            <p class="smallTitle">About</p>
+            <h2 id="aboutTitle">About This Project</h2>
           </div>
 
-          <aside class="panel" id="settings" aria-labelledby="settings-title">
-            <div class="section-heading">
-              <p class="eyebrow">Settings</p>
-              <h2 id="settings-title">Currency and data</h2>
+          <p class="plainText">
+            Student Budget Tracker was created to support basic money management for students.
+            It records expenses, converts supported currencies to RWF, and shows whether the
+            spending is still within the monthly budget.
+          </p>
+        </section>
+
+        <section class="pageSection" id="features" aria-labelledby="featuresTitle">
+          <div class="sectionTitle">
+            <p class="smallTitle">Features</p>
+            <h2 id="featuresTitle">What The Website Can Do</h2>
+          </div>
+
+          <div class="featureList">
+            <article class="featureBox">
+              <h3>Add Expense</h3>
+              <p>Save an expense with a description, amount, category, currency, and date.</p>
+            </article>
+            <article class="featureBox">
+              <h3>Monthly Budget</h3>
+              <p>Set a spending limit and compare it with the total amount spent.</p>
+            </article>
+            <article class="featureBox">
+              <h3>Financial Summary</h3>
+              <p>Review total expenses, remaining balance, and the most used category.</p>
+            </article>
+            <article class="featureBox">
+              <h3>Expense Search</h3>
+              <p>Filter saved records and arrange them in a clear table.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="pageSection" id="addExpense" aria-labelledby="addExpenseTitle">
+          <div class="sectionTitle">
+            <p class="smallTitle">Form</p>
+            <h2 id="addExpenseTitle">Add Expense</h2>
+          </div>
+
+          <form class="expenseForm simpleBox" novalidate>
+            <div class="inputGroup">
+              <label for="expenseDescription">Expense Description</label>
+              <input id="expenseDescription" name="description" type="text" autocomplete="off" aria-describedby="descriptionHelp descriptionError" aria-invalid="false" required>
+              <p class="helpText" id="descriptionHelp">Example: Lunch at cafeteria</p>
+              <p class="errorText" id="descriptionError" aria-live="polite"></p>
             </div>
 
-            <form class="settings-form">
-              <div class="field-group">
-                <label for="base-currency">Base currency</label>
-                <select id="base-currency" name="base-currency">
+            <div class="formRow">
+              <div class="inputGroup">
+                <label for="expenseAmount">Expense Amount</label>
+                <input id="expenseAmount" name="amount" type="text" inputmode="decimal" aria-describedby="amountHelp amountError" aria-invalid="false" required>
+                <p class="helpText" id="amountHelp">Use a whole number or two decimal places.</p>
+                <p class="errorText" id="amountError" aria-live="polite"></p>
+              </div>
+
+              <div class="inputGroup">
+                <label for="expenseCurrency">Currency</label>
+                <select id="expenseCurrency" name="currency">
                   <option value="RWF">RWF</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
                 </select>
               </div>
-
-              <div class="field-group">
-                <label for="usd-rate">Manual USD to RWF rate</label>
-                <input id="usd-rate" name="usd-rate" type="text" inputmode="decimal" value="1300" aria-describedby="usd-rate-hint usd-rate-error" aria-invalid="false">
-                <p class="field-hint" id="usd-rate-hint">Used to convert USD records into RWF totals.</p>
-                <p class="field-error" id="usd-rate-error" aria-live="polite"></p>
-              </div>
-
-              <div class="field-group">
-                <label for="eur-rate">Manual EUR to RWF rate</label>
-                <input id="eur-rate" name="eur-rate" type="text" inputmode="decimal" value="1450" aria-describedby="eur-rate-hint eur-rate-error" aria-invalid="false">
-                <p class="field-hint" id="eur-rate-hint">Used to convert EUR records into RWF totals.</p>
-                <p class="field-error" id="eur-rate-error" aria-live="polite"></p>
-              </div>
-
-              <div class="field-group">
-                <label for="spending-cap">Spending cap</label>
-                <input id="spending-cap" name="spending-cap" type="text" inputmode="decimal" placeholder="Example: 100000" aria-describedby="spending-cap-hint spending-cap-error" aria-invalid="false">
-                <p class="field-hint" id="spending-cap-hint">Cap is checked against the total converted to RWF.</p>
-                <p class="field-error" id="spending-cap-error" aria-live="polite"></p>
-              </div>
-
-              <div class="field-group">
-                <label for="import-json">Import JSON backup</label>
-                <input id="import-json" name="import-json" type="file" accept="application/json,.json">
-              </div>
-
-              <p class="status-message compact" id="settings-status" role="status" aria-live="polite">
-                Settings and data messages will appear here.
-              </p>
-
-              <div class="button-row">
-                <button class="button primary" id="export-json" type="button">Export JSON</button>
-                <button class="button secondary" id="import-json-button" type="button">Import JSON</button>
-              </div>
-            </form>
-          </aside>
-        </div>
-      </section>
-
-      <section class="section" id="records" aria-labelledby="records-title">
-        <div class="container">
-          <div class="section-heading">
-            <p class="eyebrow">Records</p>
-            <h2 id="records-title">Transactions</h2>
-          </div>
-
-          <div class="toolbar" aria-label="Search and sort controls">
-            <div class="field-group search-field">
-              <label for="search-pattern">Regex search</label>
-              <input id="search-pattern" name="search-pattern" type="search" placeholder="coffee|tea" aria-describedby="search-hint search-error">
-              <p class="field-hint" id="search-hint">Try patterns like <code>coffee|tea</code> or <code>\.\d{2}\b</code>.</p>
-              <p class="field-error" id="search-error" aria-live="polite"></p>
             </div>
 
-            <label class="checkbox-label" for="case-insensitive">
-              <input id="case-insensitive" name="case-insensitive" type="checkbox" checked>
-              Case-insensitive
+            <div class="formRow">
+              <div class="inputGroup">
+                <label for="expenseCategory">Expense Category</label>
+                <select id="expenseCategory" name="category" aria-describedby="categoryError" aria-invalid="false" required>
+                  <option value="">Choose category</option>
+                  <option value="Food">Food</option>
+                  <option value="Books">Books</option>
+                  <option value="Transport">Transport</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Fees">Fees</option>
+                  <option value="Other">Other</option>
+                </select>
+                <p class="errorText" id="categoryError" aria-live="polite"></p>
+              </div>
+
+              <div class="inputGroup">
+                <label for="expenseDate">Date</label>
+                <input id="expenseDate" name="date" type="date" aria-describedby="dateError" aria-invalid="false" required>
+                <p class="errorText" id="dateError" aria-live="polite"></p>
+              </div>
+            </div>
+
+            <p class="messageBox smallMessage" id="formMessage" role="status" aria-live="polite">
+              Form messages will appear here.
+            </p>
+
+            <div class="buttonArea">
+              <button class="mainButton" id="addExpenseButton" type="submit">Add Expense</button>
+              <button class="lightButton" type="reset">Clear Form</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="pageSection" id="summary" aria-labelledby="summaryTitle">
+          <div class="sectionTitle">
+            <p class="smallTitle">Results</p>
+            <h2 id="summaryTitle">Financial Summary</h2>
+          </div>
+
+          <div class="summaryGrid" aria-label="Budget summary">
+            <article class="reportCard">
+              <h3>Total Expenses</h3>
+              <p class="summaryValue" id="totalExpenses">RWF 0</p>
+            </article>
+            <article class="reportCard">
+              <h3>Expense Records</h3>
+              <p class="summaryValue" id="totalTransactions">0</p>
+            </article>
+            <article class="reportCard">
+              <h3>Main Category</h3>
+              <p class="summaryValue" id="mainCategory">None</p>
+            </article>
+            <article class="reportCard">
+              <h3>Remaining Balance</h3>
+              <p class="summaryValue" id="remainingBalance">Set budget</p>
+            </article>
+          </div>
+
+          <div class="chartBox" aria-labelledby="weeklyTitle">
+            <div>
+              <h3 id="weeklyTitle">Weekly Expense Chart</h3>
+              <p id="weeklySummary">The chart will update when expenses are added.</p>
+            </div>
+            <div class="weeklyChart" id="weeklyChart" aria-hidden="true"></div>
+          </div>
+
+          <p class="messageBox" id="budgetMessage" role="status" aria-live="polite">
+            Budget messages will appear here after a monthly budget is entered.
+          </p>
+        </section>
+
+        <section class="pageSection" id="transactions" aria-labelledby="transactionsTitle">
+          <div class="sectionTitle">
+            <p class="smallTitle">Records</p>
+            <h2 id="transactionsTitle">Expense Table</h2>
+          </div>
+
+          <div class="tableControls" aria-label="Search and sort controls">
+            <div class="inputGroup searchBox">
+              <label for="expenseSearch">Search Expenses</label>
+              <input id="expenseSearch" name="expenseSearch" type="search" placeholder="coffee|tea" aria-describedby="searchHelp searchError">
+              <p class="helpText" id="searchHelp">You may search by words or simple regex patterns.</p>
+              <p class="errorText" id="searchError" aria-live="polite"></p>
+            </div>
+
+            <label class="checkLabel" for="ignoreCase">
+              <input id="ignoreCase" name="ignoreCase" type="checkbox" checked>
+              Ignore letter case
             </label>
 
-            <div class="field-group sort-field">
-              <label for="sort-records">Sort by</label>
-              <select id="sort-records" name="sort-records">
-                <option value="date-desc">Date newest first</option>
-                <option value="date-asc">Date oldest first</option>
+            <div class="inputGroup sortBox">
+              <label for="sortExpenses">Sort Expenses</label>
+              <select id="sortExpenses" name="sortExpenses">
+                <option value="date-desc">Newest date first</option>
+                <option value="date-asc">Oldest date first</option>
                 <option value="description-asc">Description A-Z</option>
                 <option value="description-desc">Description Z-A</option>
                 <option value="amount-asc">Amount low to high</option>
@@ -242,10 +228,10 @@
             </div>
           </div>
 
-          <div class="table-wrap">
-            <table>
+          <div class="tableBox">
+            <table id="expenseTable">
               <caption>
-                Student spending records. Use the search and sort controls to filter this table.
+                Saved student expenses. Use the controls above to search and sort the table.
               </caption>
               <thead>
                 <tr>
@@ -253,49 +239,147 @@
                   <th scope="col">Description</th>
                   <th scope="col">Category</th>
                   <th scope="col">Amount</th>
-                  <th scope="col">Actions</th>
+                  <th scope="col">Action</th>
                 </tr>
               </thead>
-              <tbody id="records-body">
+              <tbody id="expenseTableBody">
                 <tr>
-                  <td colspan="5">No transactions yet.</td>
+                  <td colspan="5">No expenses added yet.</td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="section" id="about" aria-labelledby="about-title">
-        <div class="container about-panel">
-          <div class="section-heading">
-            <p class="eyebrow">About</p>
-            <h2 id="about-title">Why this app exists</h2>
+        <section class="pageSection" id="settings" aria-labelledby="settingsTitle">
+          <div class="sectionTitle">
+            <p class="smallTitle">Settings</p>
+            <h2 id="settingsTitle">App Settings</h2>
           </div>
 
-          <p>
-            Student Finance Tracker is designed to help students record daily expenses, review spending
-            patterns, and stay aware of a personal spending cap. It focuses on quick entry, readable
-            summaries, regex search, and accessible controls.
-          </p>
+          <form class="settingsForm simpleBox">
+            <fieldset class="settingsGroup">
+              <legend>Budget Settings</legend>
+              <div class="formRow">
+                <div class="inputGroup">
+                  <label for="monthlyBudget">Monthly Budget</label>
+                  <input id="monthlyBudget" name="monthlyBudget" type="text" inputmode="decimal" placeholder="Example: 100000" aria-describedby="monthlyBudgetHelp monthlyBudgetError" aria-invalid="false">
+                  <p class="helpText" id="monthlyBudgetHelp">This amount is compared with total expenses.</p>
+                  <p class="errorText" id="monthlyBudgetError" aria-live="polite"></p>
+                </div>
 
-          <address>
-            GitHub:
-            <a href="https://github.com/bbenoit-droid">bbenoit-droid</a><br>
-            Email:
-            <a href="mailto:b.benoit@alustudent.com">b.benoit@alustudent.com</a><br>
-            Telephone:
+                <div class="inputGroup">
+                  <label for="defaultCurrency">Default Expense Currency</label>
+                  <select id="defaultCurrency" name="defaultCurrency">
+                    <option value="RWF">RWF</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
+                  <p class="helpText">This is selected first when adding a new expense.</p>
+                </div>
+              </div>
+
+              <div class="formRow">
+                <div class="inputGroup">
+                  <label for="usdRate">USD to RWF Rate</label>
+                  <input id="usdRate" name="usdRate" type="text" inputmode="decimal" value="1300" aria-describedby="usdRateHelp usdRateError" aria-invalid="false">
+                  <p class="helpText" id="usdRateHelp">Used when an expense is entered in USD.</p>
+                  <p class="errorText" id="usdRateError" aria-live="polite"></p>
+                </div>
+
+                <div class="inputGroup">
+                  <label for="eurRate">EUR to RWF Rate</label>
+                  <input id="eurRate" name="eurRate" type="text" inputmode="decimal" value="1450" aria-describedby="eurRateHelp eurRateError" aria-invalid="false">
+                  <p class="helpText" id="eurRateHelp">Used when an expense is entered in EUR.</p>
+                  <p class="errorText" id="eurRateError" aria-live="polite"></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="settingsGroup">
+              <legend>Display Settings</legend>
+              <div class="inputGroup">
+                <label for="displayCurrency">Display Currency</label>
+                <select id="displayCurrency" name="displayCurrency">
+                  <option value="RWF">RWF</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+                <p class="helpText">This controls the currency used in the financial summary.</p>
+              </div>
+
+              <label class="switchLabel" for="themeToggle">
+                <span>
+                  <strong>Dark Mode</strong>
+                  <small>Change the website colors.</small>
+                </span>
+                <input id="themeToggle" name="themeToggle" type="checkbox">
+              </label>
+
+              <label class="switchLabel" for="showWeeklyChart">
+                <span>
+                  <strong>Show Weekly Chart</strong>
+                  <small>Display or hide the weekly expense chart.</small>
+                </span>
+                <input id="showWeeklyChart" name="showWeeklyChart" type="checkbox" checked>
+              </label>
+
+              <label class="switchLabel" for="compactTable">
+                <span>
+                  <strong>Compact Expense Table</strong>
+                  <small>Use smaller table spacing when reviewing many expenses.</small>
+                </span>
+                <input id="compactTable" name="compactTable" type="checkbox">
+              </label>
+            </fieldset>
+
+            <fieldset class="settingsGroup">
+              <legend>System Behavior</legend>
+              <label class="switchLabel" for="confirmBeforeDelete">
+                <span>
+                  <strong>Ask Before Deleting</strong>
+                  <small>Show a confirmation message before an expense is removed.</small>
+                </span>
+                <input id="confirmBeforeDelete" name="confirmBeforeDelete" type="checkbox" checked>
+              </label>
+            </fieldset>
+
+            <fieldset class="settingsGroup">
+              <legend>Data Management</legend>
+              <div class="inputGroup">
+                <label for="jsonFile">Import JSON File</label>
+                <input id="jsonFile" name="jsonFile" type="file" accept="application/json,.json">
+              </div>
+
+              <div class="buttonArea dataButtons">
+                <button class="mainButton" id="downloadJsonButton" type="button">Export JSON</button>
+                <button class="lightButton" id="uploadJsonButton" type="button">Import JSON</button>
+                <button class="lightButton" id="downloadCsvButton" type="button">Export CSV</button>
+                <button class="dangerButton" id="clearDataButton" type="button">Clear All Data</button>
+              </div>
+            </fieldset>
+
+            <p class="messageBox smallMessage" id="settingsMessage" role="status" aria-live="polite">
+              Settings messages will appear here.
+            </p>
+          </form>
+        </section>
+
+        <section class="pageSection" id="contact" aria-labelledby="contactTitle">
+          <div class="sectionTitle">
+            <p class="smallTitle">Contact</p>
+            <h2 id="contactTitle">Student Contact</h2>
+          </div>
+
+          <address class="contactBox">
+            <a href="https://github.com/bbenoit-droid">github.com/bbenoit-droid</a>
+            <a href="mailto:b.benoit@alustudent.com">b.benoit@alustudent.com</a>
             <a href="tel:+250786101724">+250786101724</a>
           </address>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </div>
 
-    <footer class="site-footer">
-      <div class="container">
-        <p>&copy; 2026 Student Finance Tracker. Built with vanilla HTML, CSS, and JavaScript.</p>
-      </div>
-    </footer>
     <script type="module" src="scripts/app.js"></script>
   </body>
 </html>

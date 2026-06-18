@@ -1,5 +1,17 @@
 const now = new Date().toISOString();
 
+export const defaultSettings = {
+  usdRate: 1300,
+  eurRate: 1450,
+  cap: 0,
+  theme: "light",
+  defaultCurrency: "RWF",
+  displayCurrency: "RWF",
+  showWeeklyChart: true,
+  compactTable: false,
+  confirmBeforeDelete: true
+};
+
 // State is kept in one module so rendering, storage, and validation do not each invent their own data shape.
 export const state = {
   records: [
@@ -45,11 +57,7 @@ export const state = {
     }
   ],
   editingId: null,
-  settings: {
-    usdRate: 1300,
-    eurRate: 1450,
-    cap: 0
-  }
+  settings: { ...defaultSettings }
 };
 
 function nextRecordId() {
