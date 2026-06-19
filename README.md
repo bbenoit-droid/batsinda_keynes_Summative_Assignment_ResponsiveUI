@@ -45,4 +45,5 @@ npm run check
 
 ## Sample Data
 
-Use `seed.json` from the Settings section to import sample expenses.
+The app now loads sample expenses automatically on first run when no saved data exists.
+If you want to import a different backup later, you can still use `seed.json` from the Settings section.

@@ -45,6 +45,8 @@ const jsonFile = document.querySelector("#jsonFile");
 const uploadJsonButton = document.querySelector("#uploadJsonButton");
 const downloadCsvButton = document.querySelector("#downloadCsvButton");
 const clearDataButton = document.querySelector("#clearDataButton");
+const navButtons = document.querySelectorAll(".sideMenu button[data-view]");
+const viewSections = document.querySelectorAll(".pageSection");
 
 const errorTargets = {
   description: document.querySelector("#descriptionError"),
@@ -119,27 +121,79 @@ function applyDisplaySettings() {
   document.body.classList.toggle("compactTable", state.settings.compactTable);
   chartBox.hidden = !state.settings.showWeeklyChart;
 }
-function loadInitialData() {
+
+function setActiveView(viewName) {
+  viewSections.forEach((section) => {
+    const isActive = section.id === viewName;
+    section.hidden = !isActive;
+    section.classList.toggle("is-active", isActive);
+  });
+
+  navButtons.forEach((button) => {
+    const isActive = button.dataset.view === viewName;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function loadSeedData() {
+  try {
+    const response = await fetch("./seed.json");
+    if (!response.ok) {
+      return false;
+    }
+
+    const seedData = await response.json();
+    const result = validateImportData(seedData);
+
+    if (!result.valid) {
+      return false;
+    }
+
+    replaceRecords(result.data.records);
+    saveBudgetSettings(result.data.settings);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function loadInitialData() {
   const saved = loadSavedData();
 
-  if (!saved) {
+  if (saved) {
+    const result = validateImportData(saved);
+
+    if (!result.valid) {
+      const loadedSeed = await loadSeedData();
+      settingsMessage.textContent = loadedSeed
+        ? "Saved browser data was invalid, so sample seed data was loaded instead."
+        : "Saved browser data was invalid, so defaults are being used.";
+      applySavedSettingsToForm();
+      applyDisplaySettings();
+      return;
+    }
+
+    replaceRecords(result.data.records);
+    saveBudgetSettings(result.data.settings);
     applySavedSettingsToForm();
     applyDisplaySettings();
+    settingsMessage.textContent = "Saved browser data loaded.";
     return;
   }
 
-  const result = validateImportData(saved);
+  const loadedSeed = await loadSeedData();
 
-  if (!result.valid) {
-    settingsMessage.textContent = "Saved browser data could not be loaded, so sample data is being used.";
-    return;
+  if (loadedSeed) {
+    settingsMessage.textContent = "Sample seed data loaded automatically.";
+  } else {
+    settingsMessage.textContent = "No saved data found, so default settings are being used.";
   }
 
-  replaceRecords(result.data.records);
-  saveBudgetSettings(result.data.settings);
   applySavedSettingsToForm();
   applyDisplaySettings();
-  settingsMessage.textContent = "Saved browser data loaded.";
 }
 function readExpenseForm() {
   return {
@@ -390,7 +444,10 @@ function showExpenseTable() {
     const actionGroup = document.createElement("div");
     actionGroup.className = "tableButtons";
     actionGroup.append(
-      createActionButton("Edit", "edit", () => fillExpenseForm(record)),
+      createActionButton("Edit", "edit", () => {
+        setActiveView("addExpense");
+        fillExpenseForm(record);
+      }),
       createActionButton("Delete", "delete", () => {
         const canDelete =
           !state.settings.confirmBeforeDelete || confirm(`Delete "${record.description}"?`);
@@ -551,8 +608,19 @@ function clearAllData() {
   settingsMessage.textContent = "All saved data was cleared and settings were reset.";
 }
 
+async function initializeApp() {
+  await loadInitialData();
+  setActiveView("home");
+  showExpenseTable();
+  showFinancialSummary();
+  persist();
+}
+
 if (expenseForm) {
-  loadInitialData();
+  navButtons.forEach((button) => {
+    button.addEventListener("click", () => setActiveView(button.dataset.view));
+  });
+
   expenseForm.addEventListener("submit", handleExpenseSubmit);
   expenseForm.addEventListener("reset", () => resetExpenseForm());
   expenseSearch.addEventListener("input", showExpenseTable);
@@ -571,7 +639,5 @@ if (expenseForm) {
   uploadJsonButton.addEventListener("click", importJson);
   downloadCsvButton.addEventListener("click", exportCsv);
   clearDataButton.addEventListener("click", clearAllData);
-  showExpenseTable();
-  showFinancialSummary();
-  persist();
+  initializeApp();
 }
